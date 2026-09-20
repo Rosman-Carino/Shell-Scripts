@@ -18,12 +18,6 @@ num_assignments="${2:?$usage}"
 num_exams="${3:?$usage}"
 num_sections="${4:?usage}"
 
-#Validate Class Name
-if [ -z "$class_name" ]; then
-    echo "Error: Empty Class Name. Please enter a Class name for the corresponding argument"
-    exit 1
-fi
-
 #Validate Arguments
 nums=("$num_assignemnts" "$num_exams" "$num_sections")
 if [[ "$create_lecture_subdirs" == true ]]; then
