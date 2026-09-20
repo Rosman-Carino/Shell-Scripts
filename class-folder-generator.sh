@@ -1,18 +1,41 @@
 #!/bin/bash
+set -u
+
+usage="Usage: $0 [-l <num_lectures>] <class_name> <num_assignments> <num_exams> <num_sections>"
 
 # Lecture Directory Flag
 create_lecture_subdirs=false
 num_lectures=""
-if [[ "${1:-}" == "-l"]]; then
+if [[ "${1:-}" == "-l" ]]; then
     create_lecture_subdirs=true
-    num_lectures="${2:?}"
+    num_lectures="${2:?$usage}"
     shift 2
 fi 
 
 # User Input Arguments
-num_assignments="$1"
-num_exams="$2"
-num_sections="$3"
+class_name="${1:?$usage}"
+num_assignments="${2:?$usage}"
+num_exams="${3:?$usage}"
+num_sections="${4:?usage}"
+
+#Validate Class Name
+if [ -z "$class_name" ]; then
+    echo "Error: Empty Class Name. Please enter a Class name for the corresponding argument"
+    exit 1
+fi
+
+#Validate Arguments
+nums=("$num_assignemnts" "$num_exams" "$num_sections")
+if [[ "$create_lecture_subdirs" == true ]]; then
+    nums+=("$num_lectures")
+fi
+
+for num in "${nums[@]}"; do
+    if [[ ! "$num" =~ ^[0-9]+$ ]]; then
+        echo "Error: Arguments must be non-negative integers (got '$num')">&2
+        exit 1 
+    fi
+done
 
 create_starter_and_submission_directories () {
     local curr_directory_name="$1"
@@ -38,7 +61,7 @@ create_subdirectories () {
 }
 
 # Create Default Directories
-mkdir -p Assignments Exams Lectures Lecture-Videos Sections
+mkdir -p "$class_name"/{Assignments,Exams,Lectures,Lecture-Videos,Sections}
 
 #Create Subdirectories for Lectures
 if [[ "$create_lecture_subdirs" == true ]]; then
@@ -52,3 +75,4 @@ fi
 create_starter_and_submission_directories "Assignments" "$num_assignments"
 create_starter_and_submission_directories "Sections" "$num_sections"
 create_subdirectories "Exams" "$num_exams"
+Echo "Completion: $class_name class directory completed."
